@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaLinkedin, FaGithub } from 'react-icons/fa'
+import emailjs from '@emailjs/browser'
+
+// Initialize EmailJS (get these from https://dashboard.emailjs.com/)
+emailjs.init('r5zxYzyuF0N0Z3w-u') // Replace with your EmailJS public key
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -10,6 +14,7 @@ export default function Contact() {
   })
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -22,33 +27,30 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
 
     try {
-      // Send to backend API
-      const response = await fetch('http://localhost:5000/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
+      // Send email using EmailJS
+      const result = await emailjs.send(
+        'service_m0vcj8b', // Replace with your EmailJS service ID
+        'template_barmlzs', // Replace with your EmailJS template ID
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          to_email: 'srimanthreddy.n23@iiits.in' // Your email address
+        }
+      )
 
-      const data = await response.json()
-
-      if (data.success) {
-        // Show success message
+      if (result.text === 'OK') {
         setSubmitted(true)
         setFormData({ name: '', email: '', subject: '', message: '' })
-
-        // Hide success message after 5 seconds
         setTimeout(() => setSubmitted(false), 5000)
-      } else {
-        console.error('Error:', data.message)
-        alert('Error: ' + data.message)
       }
     } catch (error) {
-      console.error('Error submitting form:', error)
-      alert('Failed to send message. Make sure the backend server is running on http://localhost:5000')
+      console.error('EmailJS Error:', error)
+      setError('Failed to send message. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -139,6 +141,12 @@ export default function Contact() {
               {submitted && (
                 <div className="mb-6 p-4 bg-green-500 bg-opacity-20 border border-green-500 rounded-lg text-green-300 animate-fadeInUp">
                   Message sent successfully! I'll get back to you soon.
+                </div>
+              )}
+
+              {error && (
+                <div className="mb-6 p-4 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg text-red-300 animate-fadeInUp">
+                  {error}
                 </div>
               )}
 
