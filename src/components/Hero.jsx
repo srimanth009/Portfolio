@@ -60,7 +60,7 @@ export default function Hero() {
               Get In Touch
             </a>
             <a
-              href="/Srimanth_resume.pdf"
+              href="/SrimanthReddy_Resume.pdf"
               download
               className="px-8 py-3 border-2 border-blue-500 text-blue-400 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition-smooth transform hover:scale-105 flex items-center justify-center gap-2"
             >
